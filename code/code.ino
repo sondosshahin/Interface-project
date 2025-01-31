@@ -81,18 +81,18 @@ void setup() {
   // Attach Interrupts
   attachInterrupt(digitalPinToInterrupt(encoder1_a), encoder1_isr, RISING);
   attachInterrupt(digitalPinToInterrupt(encoder2_a), encoder2_isr, RISING);
-
-  // Initialize sensors
-  setupIR();
- // setupLiDAR();
   
+  
+  Wire.begin(21, 22);  // SDA, SCL
+
   // Initialize MPU6050
-  Wire.begin();
   mpu.begin();
   mpu.calcOffsets();
   mpu.update();
 
-  
+  // Initialize sensors
+  setupIR();
+  setupLiDAR();
 
   // Reset Encoder Counts
   encoder1_count = 0;
@@ -103,7 +103,37 @@ void setup() {
 
 void loop() {
 
-  //move();
+  //read lidar - front wall
+  int distance = readLiDAR();
+  if (distance < 20){   //front wall within 20 cm
+    stopMotors();
+    delay(500);
+    bool irLeft = readIRLeft();
+    bool irRight = readIRRight();
+    if (!irLeft && irRight) {     //there is a wall in the left, right is open
+      Serial.print("Left IR activated,,, turning right ");
+      stopMotors();
+      delay(500);
+      turnRight();
+      move();
+    }
+    else if (!irRight && irLeft) {     //there is a wall in the right, left is open
+      Serial.print("Right IR activated,,, turning left ");
+      stopMotors();
+      delay(500);
+      turnLeft();
+      move();
+    }
+    else{ //stuck
+      Serial.print("stuck");
+    }
+  }
+  else{
+    move();
+  }
+  delay(700);
+  
+/*
   bool irLeft = readIRLeft();
   bool irRight = readIRRight();
   if (!irLeft) {     //there is a wall in the left
@@ -125,7 +155,7 @@ void loop() {
     move();
   }
   delay(700);
-
+*/
 }
   
 
@@ -284,11 +314,12 @@ void adjustMotorSpeeds(float currentAngle, float targetAngle) {
   // Apply adjusted speeds
   analogWrite(ENA, leftSpeed);
   analogWrite(ENB, rightSpeed);
-
-   Serial.print("left "); 
-    Serial.println(leftSpeed);
-    Serial.print("Right ");
-    Serial.println(rightSpeed);
+/*
+  Serial.print("left "); 
+  Serial.println(leftSpeed);
+  Serial.print("Right ");
+  Serial.println(rightSpeed);
+*/
   // Update lastError for the next cycle
   lastError = error;
 
