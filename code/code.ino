@@ -168,7 +168,7 @@ void turnRight() {
   rawAngle = mpu.getAngleZ();
   angle = abs(rawAngle);
 
-  float targetAngle = prevAngle + 60.0; // Calculate the target angle
+  float targetAngle = prevAngle + 70.0; // Calculate the target angle
   
   while (angle < targetAngle) {
     mpu.update();
@@ -203,7 +203,7 @@ void turnLeft() {
   rawAngle = mpu.getAngleZ();
   angle = rawAngle;  // Use signed value
 
-  float targetAngle = prevAngle - 60.0; // Left turn target
+  float targetAngle = prevAngle - 80.0; // Left turn target
   
   while (angle > targetAngle + 2.0) {  // Ensuring it completes the turn
     mpu.update();
@@ -225,8 +225,8 @@ void turnLeft() {
     digitalWrite(motor1_in2, HIGH);
     digitalWrite(motor2_in3, HIGH);
     digitalWrite(motor2_in4, LOW);
-    analogWrite(ENA,  max((int)(baseSpeed + correction),100));
-    analogWrite(ENB,  max((int)(baseSpeed - correction),100));
+    analogWrite(ENA,  max((int)(baseSpeed - correction),100));
+    analogWrite(ENB,  max((int)(baseSpeed + correction),100));
   }
   
   stopMotors();
@@ -336,7 +336,7 @@ void setupIR() {
 void setupLiDAR() {
   lidar.setTimeout(500);
   if (!lidar.init()) {
-    Serial.println("Failed to detect and initialize LiDAR sensor!");
+    Serial.println("Failed to detect and initialize LiDAR sensor");
     while (1); // Stop execution if LiDAR fails
   }
 }
@@ -367,7 +367,7 @@ bool readIRRight2() {
 int readLiDAR() {
   int distance = lidar.readRangeSingleMillimeters() / 10; // Convert mm to cm
   if (lidar.timeoutOccurred()) {
-    Serial.println("LiDAR Timeout!");
+    Serial.println("LiDAR Timeout");
     return -1; // Return -1 if timeout occurs
   }
   return distance;
