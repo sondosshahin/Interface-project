@@ -125,7 +125,7 @@ void loop() {
       move();
     }
     else{ //stuck
-      Serial.print("stuck");
+      Serial.println("stuck");
     }
   }
   else{
@@ -133,42 +133,19 @@ void loop() {
   }
   delay(700);
   
-/*
-  bool irLeft = readIRLeft();
-  bool irRight = readIRRight();
-  if (!irLeft) {     //there is a wall in the left
-    Serial.print("Left IR activated,,, turning right ");
-    stopMotors();
-    delay(500);
-    turnRight();
-    move();
-  }
-  
-  else if (!irRight) {     //there is a wall in the left
-    Serial.print("Right IR activated,,, turning left ");
-    stopMotors();
-    delay(500);
-    turnLeft();
-    move();
-  }
-  else {
-    move();
-  }
-  delay(700);
-*/
 }
   
 
 const float correctionFactor = 2.3; // Adjust this value as needed
-const int baseSpeed = 220; // Adjust the base motor speed as needed
+const int baseSpeed = 100; // Adjust the base motor speed as needed
 
 void turnRight() {
   
   
   rawAngle = mpu.getAngleZ();
-  angle = abs(rawAngle);
+  angle = rawAngle;
 
-  float targetAngle = prevAngle + 70.0; // Calculate the target angle
+  targetAngle = prevAngle + 65.0; // Calculate the target angle
   
   while (angle < targetAngle) {
     mpu.update();
@@ -193,8 +170,9 @@ void turnRight() {
   }
   
   stopMotors();
-  
   prevAngle = angle; // Update the previous angle
+  delay(500); // Give time before turning
+  
 }
 
 
@@ -203,7 +181,7 @@ void turnLeft() {
   rawAngle = mpu.getAngleZ();
   angle = rawAngle;  // Use signed value
 
-  float targetAngle = prevAngle - 80.0; // Left turn target
+  targetAngle = prevAngle - 80.0; // Left turn target
   
   while (angle > targetAngle + 2.0) {  // Ensuring it completes the turn
     mpu.update();
@@ -230,7 +208,9 @@ void turnLeft() {
   }
   
   stopMotors();
-  prevAngle = targetAngle; // Update the previous angle
+  prevAngle = angle; // Update the previous angle
+  delay(500); // Give time before turning
+  
 }
 
 
@@ -303,7 +283,7 @@ void adjustMotorSpeeds(float currentAngle, float targetAngle) {
 
   int speedAdjustment = (int)(Kp * error + Ki * integral + Kd * derivative);  // PID formula
 
-  int base = 60; 
+  int base = 150; 
   int leftSpeed = base - speedAdjustment;
   int rightSpeed = base + speedAdjustment;
   
