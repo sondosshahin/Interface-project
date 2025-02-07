@@ -1,3 +1,5 @@
+// This is the version that was last tried in the university with these parameters
+
 #include <Wire.h>
 #include <MPU6050_light.h>
 #include <PID_v1_bc.h>
